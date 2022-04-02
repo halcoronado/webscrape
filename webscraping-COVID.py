@@ -2,6 +2,8 @@
 # pip install bs4 (for beautifulsoup - python tool to parse HTML)
 
 
+from cgi import test
+from turtle import st
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 
@@ -21,6 +23,75 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML
 
 
 
+req = Request(url, headers=headers)
+
+webpage = urlopen(req).read()
+
+soup = BeautifulSoup(webpage, 'html.parser')
+
+title = soup.title
+
+print(title.text)
+
+table_rows = soup.findAll("tr")
+
+state_death_ratio = ''
+state_best_testing = ''
+state_worst_testing =''
+highest_death_ratio = 0.0
+high_test_ratio = 0.0
+low_test_ratio = 100.0
+
+for row in table_rows[2:51]:
+    td = row.findAll("td")
+    state = td[1].text
+    total_cases = int(td[2].text.replace(',',''))
+    total_deaths = int(td[4].text.replace(',',''))
+    total_tested = int(td[10].text.replace(',',''))
+    
+    death_rat = total_deaths/total_cases
+    test_rat = total_cases/total_tested
+    
+
+    if death_rat > highest_death_ratio:
+        highest_death_ratio = death_rat
+        state_death_ratio = state
+
+    if test_rat < low_test_ratio:
+        state_best_testing = state
+        low_test_ratio = test_rat
+    
+    if test_rat > high_test_ratio:
+        state_worst_testing = state
+        high_test_ratio= test_rat
+
+
+    '''
+    print( f'State:{state}')
+    print( f'Total Cases:{total_cases}')
+    print( f'Total Deaths:{total_deaths}')
+    print( f'Total Tessted:{total_deaths}')
+    input()
+    '''
+    
+
+
+print(f'State with the highest death ratio is {state_death_ratio}') ##pennsylvania 
+print ('Death Ratio:', format(highest_death_ratio, ".2%")) ##1.59%
+print('')
+print(f'State with the best testing ratio is {state_best_testing}%') #massachutts 
+print('Test Ratio:' ,format(low_test_ratio, ".2%")) ##4.01%
+print('')
+print(f'State with the worst testing ratio is {state_worst_testing}%') ##north dakota
+print('Test Ratio:' ,format(high_test_ratio,'.2%')) #38.77%
+print('')
+
+#state index[1]
+#total cases  index[2]
+#total deaths index[4]
+#total tested index[10]
+
+#highest death ratio (total death/total cases), highest testing ratio (total cases/ total testing)
 
 
 
